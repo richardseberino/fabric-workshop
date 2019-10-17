@@ -1,6 +1,14 @@
 # fabric-workshop
 Materias do Workshop de Hyperledger Fabric
 
+# Requistos:
+- Um servidor (máquina virtual) com Ubuntu 18.04 LTS
+- 8 GB de memória
+- 4 CPUs
+
+# Instruções básicas:
+- Todas as apresentações estão na pasta "apresentacoes", e os scripts e também as instruções de cada laboratório estão na pasta "laboratorios". 
+
 # 01: Introdução
 - O que é Blockchain?
 - Hyperledger / Hyperledger Fabric
