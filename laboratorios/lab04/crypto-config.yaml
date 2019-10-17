@@ -1,0 +1,8 @@
+PeerOrgs:
+  - Name: redhat
+    Domain: redhat.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 1

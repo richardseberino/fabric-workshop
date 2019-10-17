@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-svc
+  labels:
+    app: prometheus
+spec:
+  selector:
+    app: prometheus
+  type: NodePort
+  ports:
+  - port: 9090
+    protocol: TCP
+    targetPort: 9090
+    nodePort: 31990
+    name: porta1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: prometheus
+  labels:
+    app: prometheus
+spec:
+  serviceName: prometheus-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      volumes:
+      - name: prom-config
+        hostPath:
+           path: /blockchain/prometheus/prometheus.yaml
+      containers:
+      - name: prometheus
+        image: prom/prometheus:latest
+        ports:
+        - containerPort: 9090
+        env:
+        - name: CONFIG_FILE
+          value: "/etc/prometheus/prometheus.yml"
+        - name: LICENSE
+          value: "accept"
+        volumeMounts:
+        - name: prom-config
+          mountPath: /etc/prometheus/prometheus.yml

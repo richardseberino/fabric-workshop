@@ -1,0 +1,22 @@
+{
+    "name": "dispositivo",
+    "version": "1.0.2",
+    "description": "Dispositivo",
+    "main": "chaincode.js",
+    "engines": {
+        "node": "^8.9.0",
+        "npm": ">=5"
+    },
+    "scripts": {
+        "test": "nyc mocha --recursive",
+        "start": "fabric-chaincode-node start"
+    },
+    "engineStrict": true,
+    "author": "Hyperledger",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "fabric-contract-api": "~1.4.0",
+        "fabric-shim": "~1.4.0",
+        "sha-256-js": "^1.0.3"
+    }
+}

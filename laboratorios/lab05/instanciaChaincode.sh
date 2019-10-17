@@ -1,0 +1,1 @@
+peer chaincode instantiate --connTimeout 10s -o orderer-svc:7050 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/tlsca.ibm.com-cert.pem -C ibm-channel -n contrato-ibm -v 1.0 -c '{"Args":["initLedger"]}' 

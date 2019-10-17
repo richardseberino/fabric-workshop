@@ -1,0 +1,30 @@
+# A scrape configuration scraping a Node Exporter and the Prometheus server
+# itself.
+scrape_configs:
+  # Scrape Prometheus itself every 5 seconds.
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Scrape the Node Exporter every 5 seconds.
+  - job_name: 'orderer1'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['orderer1:9443']
+  - job_name: 'orderer2'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['orderer2:9443']
+  - job_name: 'orderer3'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['orderer3:9443']
+  - job_name: 'peer1'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['peer1:9443']
+  - job_name: 'peer2'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['peer2:9443']

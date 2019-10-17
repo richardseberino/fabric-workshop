@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper1
+  labels:
+    app: zookeeper
+spec:
+  ports:
+  - port: 2181
+    protocol: TCP
+    targetPort: 2181
+    name: porta1
+  - port: 2888
+    name: porta2
+    protocol: TCP
+    targetPort: 2888
+  - port: 3888
+    name: porta3
+    protocol: TCP
+    targetPort: 3888
+  selector:
+    app: zookeeper
+    zoo_instance: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper2
+  labels:
+    app: zookeeper
+spec:
+  ports:
+  - port: 2181
+    protocol: TCP
+    targetPort: 2181
+    name: porta1
+  - port: 2888
+    name: porta2
+    protocol: TCP
+    targetPort: 2888
+  - port: 3888
+    name: porta3
+    protocol: TCP
+    targetPort: 3888
+  selector:
+    app: zookeeper
+    zoo_instance: "2"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper3
+  labels:
+    app: zookeeper
+spec:
+  ports:
+  - port: 2181
+    protocol: TCP
+    targetPort: 2181
+    name: porta1
+  - port: 2888
+    name: porta2
+    protocol: TCP
+    targetPort: 2888
+  - port: 3888
+    name: porta3
+    protocol: TCP
+    targetPort: 3888
+  selector:
+    app: zookeeper
+    zoo_instance: "3"
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper-pod1
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+  serviceName: zookeeper1
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+        zoo_instance: "1"
+    spec:
+      containers:
+      - name: zookeeper
+        image: hyperledger/fabric-zookeeper:0.4.10
+        env:
+        - name: ZOO_MY_ID
+          value: "1"
+        - name: ZOO_SERVERS
+          value: "server.1=0.0.0.0:2888:3888 server.2=zookeeper2:2888:3888 server.3=zookeeper3:2888:3888"
+        - name: ARCH
+          value: "x86_64"
+        ports:
+        - containerPort: 2181
+          name: porta1
+        - containerPort: 2888
+          name: porta2
+        - containerPort: 3888
+          name: porta3
+      imagePullSecrets:
+        - name: ibmkey
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper-pod2
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+  serviceName: zookeeper2
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+        zoo_instance: "2"
+    spec:
+      containers:
+      - name: zookeeper
+        image: hyperledger/fabric-zookeeper:0.4.10
+        env:
+        - name: ZOO_MY_ID
+          value: "2"
+        - name: ZOO_SERVERS
+          value: "server.1=zookeeper1:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zookeeper3:2888:3888"
+        - name: ARCH
+          value: "x86_64"
+        ports:
+        - containerPort: 2181
+          name: porta1
+        - containerPort: 2888
+          name: porta2
+        - containerPort: 3888
+          name: porta3
+      imagePullSecrets:
+        - name: ibmkey
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper-pod3
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+  serviceName: zookeeper3
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+        zoo_instance: "3"
+    spec:
+      containers:
+      - name: zookeeper
+        image: hyperledger/fabric-zookeeper:0.4.10
+        env:
+        - name: ZOO_MY_ID
+          value: "3"
+        - name: ZOO_SERVERS
+          value: "server.1=zookeeper1:2888:3888 server.2=zookeeper2:2888:3888 server.3=0.0.0.0:2888:3888"
+        - name: ARCH
+          value: "x86_64"
+        ports:
+        - containerPort: 2181
+          name: porta1
+        - containerPort: 2888
+          name: porta2
+        - containerPort: 3888
+          name: porta3
+      imagePullSecrets:
+        - name: ibmkey

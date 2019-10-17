@@ -1,0 +1,251 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: peer1
+  labels:
+    app: peer
+spec:
+  selector:
+    app: peer
+    peer_instance: "1"
+  type: NodePort
+  ports:
+  - port: 7151
+    protocol: TCP
+    targetPort: 7151
+    nodePort: 31151
+    name: porta1
+  - port: 7152
+    protocol: TCP
+    targetPort: 7152
+    nodePort: 31152
+    name: porta2
+  - port: 9443
+    protocol: TCP
+    targetPort: 9443
+    nodePort: 32446
+    name: metric
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: peer2
+  labels:
+    app: peer
+spec:
+  selector:
+    app: peer
+    peer_instance: "2"
+  type: NodePort
+  ports:
+  - port: 7151
+    protocol: TCP
+    targetPort: 7151
+    nodePort: 31251
+    name: porta1
+  - port: 7152
+    protocol: TCP
+    targetPort: 7152
+    nodePort: 31252
+    name: porta2
+  - port: 9443
+    protocol: TCP
+    targetPort: 9443
+    nodePort: 32447
+    name: metric
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: peer-pod1
+  labels:
+    app: peer
+spec:
+  serviceName: peer1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: peer
+  template:
+    metadata:
+      labels:
+        app: peer
+        peer_instance: "1"
+    spec:
+      volumes:
+      - name: nfs-peer1
+        hostPath:
+           path: /blockchain/peer01
+      - name: dockersocket
+        hostPath:
+          path: /var/run/docker.sock
+      containers:
+      - name: peer
+        image: hyperledger/fabric-peer:1.4.0
+        ports:
+        - containerPort: 7151
+        - containerPort: 7152
+        - containerPort: 7153
+        - containerPort: 9443
+        env:
+        - name: CORE_LOGGING_PEER
+          value: "INFO"
+        - name: CORE_CHAINCODE_LOGGING_LEVEL
+          value: "INFO"
+        - name: CORE_VM_ENDPOINT
+          value: "unix:///host/var/run/docker.sock"
+        - name: CORE_PEER_LISTENADDRESS
+          value: "0.0.0.0:7151"
+        - name: CORE_PEER_ID
+          value: "peer1"
+        - name: CORE_CHAINCODE_BUILDER
+          value: "hyperledger/fabric-ccenv:1.4.0"
+        - name: CORE_CHAINCODE_NODE_RUNTIME
+          value: "hyperledger/fabric-baseimage:0.4.15"
+        - name: CORE_PEER_ADDRESS
+          value: "peer1:7151"
+        - name: CORE_PEER_LOCALMSPID
+          value: "ibm"
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: "/etc/hyperledger/config/msp/users/Admin@ibm.com/msp"
+        - name: CORE_PEER_ADDRESSAUTODETECT
+          value: "true"
+        - name: CORE_LEDGER_STATE_STATEDATABASE
+          value: "CouchDB"
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
+          value: "couchdbpeer1:5984"
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME
+          value: "admin"
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+          value: "adminpw"
+        - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
+          value: "peer2:7151"
+        - name: CORE_PEER_GOSSIP_BOOTSTRAP
+          value: "peer2:7151"
+        - name: CORE_PEER_TLS_ENABLED
+          value: "true"
+        - name: CORE_PEER_GOSSIP_USELEADERELECTION
+          value: "true"
+        - name: CORE_PEER_GOSSIP_ORGLEADER
+          value: "false"
+        - name: CORE_PEER_PROFILE_ENABLED
+          value: "true"
+        - name: CORE_PEER_GOSSIP_ENDPOINT
+          value: "peer1:7151"
+        - name: CORE_PEER_TLS_CERT_FILE
+          value: "/etc/hyperledger/config/tls/server.crt"
+        - name: CORE_PEER_TLS_KEY_FILE
+          value: "/etc/hyperledger/config/tls/server.key"
+        - name: CORE_PEER_TLS_ROOTCERT_FILE
+          value: "/etc/hyperledger/config/tls/ca.crt"
+        - name: CORE_OPERATIONS_TLS_ENABLED
+          value: "false"
+        - name: CORE_OPERATIONS_LISTENADDRESS
+          value: "0.0.0.0:9443"
+        - name: CORE_METRICS_PROVIDER
+          value: "prometheus"
+        volumeMounts:
+        - name: nfs-peer1
+          mountPath: /etc/hyperledger/config
+        - mountPath: /host/var/run/docker.sock
+          name: dockersocket
+        command: ["peer"]
+        args: ["node", "start"]
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: peer-pod2
+  labels:
+    app: peer
+spec:
+  serviceName: peer2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: peer
+  template:
+    metadata:
+      labels:
+        app: peer
+        peer_instance: "2"
+    spec:
+      volumes:
+      - name: nfs-peer2
+        hostPath:
+           path: /blockchain/peer02
+      - name: dockersocket
+        hostPath:
+          path: /var/run/docker.sock
+      containers:
+      - name: peer
+        image: hyperledger/fabric-peer:1.4.0
+        ports:
+        - containerPort: 7151
+        - containerPort: 7152
+        - containerPort: 7153
+        - containerPort: 9443
+        env:
+        - name: CORE_LOGGING_PEER
+          value: "INFO"
+        - name: CORE_CHAINCODE_LOGGING_LEVEL
+          value: "INFO"
+        - name: CORE_VM_ENDPOINT
+          value: "unix:///host/var/run/docker.sock"
+        - name: CORE_CHAINCODE_BUILDER
+          value: "hyperledger/fabric-ccenv:1.4.0"
+        - name: CORE_CHAINCODE_NODE_RUNTIME
+          value: "hyperledger/fabric-baseimage:0.4.15"
+        - name: CORE_PEER_LISTENADDRESS
+          value: "0.0.0.0:7151"
+        - name: CORE_PEER_ID
+          value: "peer2"
+        - name: CORE_PEER_ADDRESS
+          value: "peer2:7151"
+        - name: CORE_PEER_LOCALMSPID
+          value: "ibm"
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: "/etc/hyperledger/config/msp/users/Admin@ibm.com/msp"
+        - name: CORE_PEER_ADDRESSAUTODETECT
+          value: "true"
+        - name: CORE_LEDGER_STATE_STATEDATABASE
+          value: "CouchDB"
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
+          value: "couchdbpeer2:5984"
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME
+          value: "admin"
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+          value: "adminpw"
+        - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
+          value: "peer2:7151"
+        - name: CORE_PEER_GOSSIP_BOOTSTRAP
+          value: "peer2:7151"
+        - name: CORE_PEER_GOSSIP_ENDPOINT
+          value: "peer2:7151"
+        - name: CORE_PEER_TLS_ENABLED
+          value: "true"
+        - name: CORE_PEER_GOSSIP_USELEADERELECTION
+          value: "true"
+        - name: CORE_PEER_GOSSIP_ORGLEADER
+          value: "false"
+        - name: CORE_PEER_PROFILE_ENABLED
+          value: "true"
+        - name: CORE_PEER_TLS_CERT_FILE
+          value: "/etc/hyperledger/config/tls/server.crt"
+        - name: CORE_PEER_TLS_KEY_FILE
+          value: "/etc/hyperledger/config/tls/server.key"
+        - name: CORE_PEER_TLS_ROOTCERT_FILE
+          value: "/etc/hyperledger/config/tls/ca.crt"
+        - name: CORE_OPERATIONS_LISTENADDRESS
+          value: "0.0.0.0:9443"
+        - name: CORE_OPERATIONS_TLS_ENABLED
+          value: "false"
+        - name: CORE_METRICS_PROVIDER
+          value: "prometheus"
+        volumeMounts:
+        - name: nfs-peer2
+          mountPath: /etc/hyperledger/config
+        - mountPath: /host/var/run/docker.sock
+          name: dockersocket
+        command: ["peer"]
+        args: ["node", "start"]

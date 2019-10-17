@@ -1,0 +1,58 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: ibm.com
+    CA:
+      Country: BR
+      Province: " "
+      Locality: " "
+      Specs:
+        - Hostname: ca-svc
+          SANS:
+            - ca.ibm.com
+            - 127.0.0.1
+            - ca-svc
+            - ca-0
+    Specs:
+      - Hostname: orderer1
+        SANS:
+          - orderer-svc
+          - orderer.ibm.com
+          - orderer
+      - Hostname: orderer2
+        SANS:
+          - orderer-svc
+          - orderer.ibm.com
+          - orderer
+      - Hostname: orderer3
+        SANS:
+          - orderer-svc
+          - orderer.ibm.com
+          - orderer
+PeerOrgs:
+  - Name: workshop
+    Domain: ibm.com
+    EnableNodeOUs: true
+    CA:
+      Country: BR
+      Province: " "
+      Locality: " "
+      Specs:
+        - Hostname: ca-svc
+          SANS:
+            - ca.ibm.com
+            - 127.0.0.1
+            - ca-svc
+            - ca-0
+    Specs:
+      - Hostname: peer1
+        SANS:
+          - peer1.ibm.com
+          - peer1
+      - Hostname: peer2
+        SANS:
+          - peer2.ibm.com
+          - peer2
+    Template:
+      Count: 0
+    Users:
+      Count: 2

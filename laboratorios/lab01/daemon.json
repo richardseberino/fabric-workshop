@@ -1,0 +1,12 @@
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "dns": ["10.0.0.2", "8.8.8.8"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+}

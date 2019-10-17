@@ -1,0 +1,8 @@
+Organizations:
+    - &Org3
+        Name: redhat
+        ID: redhat
+        MSPDir: peerOrganizations/redhat.com/peers/peer0.redhat.com/msp
+        AnchorPeers:
+            - Host: peer0.redhat.com
+              Port: 7151

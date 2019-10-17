@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: couchdb-peer1-pod
+  labels:
+    app: couchdb
+    peer: "1"
+spec:
+  serviceName: couchdbpeer1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: couchdb
+  template:
+    metadata:
+      labels:
+        app: couchdb
+        peer: "1"
+    spec:
+      containers:
+      - name: couchdb
+        image: hyperledger/fabric-couchdb:0.4.15
+        ports:
+        - containerPort: 5984
+        env:
+        - name: COUCHDB_USER
+          value: "admin"
+        - name: LICENSE
+          value: "accept"
+        - name: COUCHDB_PASSWORD
+          value: "adminpw"
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: couchdb-peer2-pod
+  labels:
+    app: couchdb
+    peer: "2"
+spec:
+  serviceName: couchdbpeer2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: couchdb
+  template:
+    metadata:
+      labels:
+        app: couchdb
+        peer: "2"
+    spec:
+      containers:
+      - name: couchdb
+        image: hyperledger/fabric-couchdb:0.4.15
+        ports:
+        - containerPort: 5984
+        env:
+        - name: COUCHDB_USER
+          value: "admin"
+        - name: LICENSE
+          value: "accept"
+        - name: COUCHDB_PASSWORD
+          value: "adminpw"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: couchdbpeer2
+  labels:
+    app: couchdb
+spec:
+  clusterIP: None
+  selector:
+    app: couchdb
+    peer: "2"
+  ports:
+  - port: 5984
+    protocol: TCP
+    targetPort: 5984
+    name: porta1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: couchdbpeer1
+  labels:
+    app: couchdb
+spec:
+  clusterIP: None
+  selector:
+    app: couchdb
+    peer: "1"
+  ports:
+  - port: 5984
+    protocol: TCP
+    targetPort: 5984
+    name: porta1

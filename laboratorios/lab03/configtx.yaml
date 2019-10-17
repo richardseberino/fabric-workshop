@@ -1,0 +1,127 @@
+Capabilities:
+    Channel: &ChannelCapabilities
+        V1_3: true
+    Orderer: &OrdererCapabilities
+        V1_1: true
+    Application: &ApplicationCapabilities
+        V1_3: true
+Channel: &ChannelDefaults
+    Policies:
+        # Who may invoke the 'Deliver' API
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        # Who may invoke the 'Broadcast' API
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        # By default, who may modify elements at this config level
+        Admins:
+            Type: Signature
+            Rule: "OR('ibm.admin','OrdererMSP.admin')"
+    Capabilities:
+        <<: *ChannelCapabilities
+Organizations:
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: ordererOrganizations/ibm.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+    - &Org1
+        Name: ibm
+        ID: ibm
+        MSPDir: peerOrganizations/ibm.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('ibm.admin', 'ibm.peer', 'ibm.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('ibm.admin', 'ibm.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('ibm.admin')"
+        AnchorPeers:
+            - Host: peer1.ibm.com
+              Port: 7151
+            - Host: peer2.ibm.com
+              Port: 7151
+Application: &ApplicationDefaults
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+          Type: Signature
+          Rule: "OR('ibm.admin')"
+    Capabilities:
+        <<: *ApplicationCapabilities
+Orderer: &OrdererDefaults
+    OrdererType: kafka
+    Addresses:
+        - orderer.ibm.com:7050
+        - orderer-svc:7050
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+    Kafka:
+        Brokers:
+            - kafka1:9092
+            - kafka2:9092
+            - kafka3:9092
+    Organizations:
+    - *OrdererOrg
+    Capabilities:
+        <<: *OrdererCapabilities
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+Profiles:
+    ModeKafkaOrderer:
+        <<: *ChannelDefaults
+        Capabilities:
+            <<: *ChannelCapabilities
+        Orderer:
+            <<: *OrdererDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+            - <<: *OrdererOrg
+        Consortiums:
+            IBMWORKSHOP:
+                Organizations:
+                - *Org1
+    ModeKafkaChannel:
+        <<: *ChannelDefaults
+        Consortium: IBMWORKSHOP
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+            Capabilities:
+                <<: *ApplicationCapabilities
