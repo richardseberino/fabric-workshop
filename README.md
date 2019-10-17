@@ -1,7 +1,7 @@
 # Hyperledger Fabric Workshop
 Materiais do Workshop de Hyperledger Fabric 1.4.x
 
-# Requistos:
+# Requisitos:
 - Um servidor (máquina virtual) com Ubuntu 18.04 LTS
 - 8 GB de memória
 - 4 CPUs
