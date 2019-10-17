@@ -1,5 +1,5 @@
-# fabric-workshop
-Materias do Workshop de Hyperledger Fabric
+# Hyperledger Fabric Workshop
+Materiais do Workshop de Hyperledger Fabric 1.4.x
 
 # Requistos:
 - Um servidor (máquina virtual) com Ubuntu 18.04 LTS
