@@ -20,4 +20,4 @@ kubectl exec -ti cli-peer0-pod bash /opt/gopath/src/github.com/hyperledger/fabri
 
 sleep 10
 echo "Instanciando o Chaincode no canal"
-kubectl exec -ti cli-peer0-pod bash /opt/gopath/src/github.com/hyperledger/fabric/peer/peer1.ibm.com/instanciaChaincode.sh
+kubectl exec -ti cli-peer1-pod bash /opt/gopath/src/github.com/hyperledger/fabric/peer/peer1.ibm.com/instanciaChaincode.sh
